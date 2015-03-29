@@ -26,8 +26,7 @@ public class MessageManager {
 		map.put(";P", emoticon6);
 		map.put(":B", emoticon7);
 		map.put(":|", emoticon8);
-		map.put(";(", emoticon9);
-		
+		map.put(";(", emoticon9);		
 	}
 
 	public String convertMessage(String s) {
@@ -40,16 +39,10 @@ public class MessageManager {
 				String key = entry.getKey();
 				String value = entry.getValue();
 				
-				s = s.replace(key, value);
-				System.out.println(s);
-			}
-			
+				s = s.replace(key, value);				
+			}			
 		}
-
 		return s;
 	}
 
-	public void zamien(int i, String c) {
-
-	}
 }
