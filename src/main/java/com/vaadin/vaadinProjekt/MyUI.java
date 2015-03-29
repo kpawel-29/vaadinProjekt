@@ -1,3 +1,7 @@
+/*
+ * emotikony źródło: http://cdn.vectorstock.com/i/composite/45,39/emoticons-vector-244539.jpg
+ */
+
 package com.vaadin.vaadinProjekt;
 
 import java.util.Date;
@@ -29,9 +33,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
-/**
- *
- */
+
 @Theme("mytheme")
 @Widgetset("com.vaadin.vaadinProjekt.MyAppWidgetset")
 @Push
@@ -85,16 +87,14 @@ public class MyUI extends UI implements MessageListener{
 			}
 		});
 		
-		Label lblWelcome = new Label("Witaj <b>"+user.getName()+"!</b>",ContentMode.HTML);
+		final Label lblWelcome = new Label("Witaj <b>"+user.getName()+"</b>",ContentMode.HTML);
 
 		header.addComponent(lblWelcome, "left: 10px; top: 5px;");
 		header.addComponent(btnLogin, "right: 10px; top: 2px;");
 
 		final HorizontalLayout footer = new HorizontalLayout();
-		//footer.setHeight("50px");
 		footer.addComponent(messageField);
 		Button btnSend = new Button("Wyślij");
-		//btnSend.setWidth(10.0f, Unit.PERCENTAGE);
 		footer.addComponent(btnSend);
 		
 		footer.setWidth(100.0f, Unit.PERCENTAGE);
@@ -102,7 +102,6 @@ public class MyUI extends UI implements MessageListener{
 
 		
 		messageField.setWidth(100.0f, Unit.PERCENTAGE);
-		// btnSend.setWidth(10.0f, Unit.PERCENTAGE);
 
 		btnOK.addClickListener(new Button.ClickListener() {
 			
@@ -110,7 +109,7 @@ public class MyUI extends UI implements MessageListener{
 			public void buttonClick(ClickEvent event) {
 				window.close();
 				user.setName(loginField.getValue().toString());
-				
+				lblWelcome.setValue("Witaj <b>"+user.getName()+"</b>");
 			}
 		});
 
@@ -164,7 +163,7 @@ public class MyUI extends UI implements MessageListener{
 			@Override
 			public void run() {
 				chatContent.addComponent(new Label("("+messageData.getTime()+") <b>" + messageData.getAuthor()
-						+ "</b>: " + messageData.text,
+						+ "</b>: " + messageData.getText(),
 						ContentMode.HTML));
 				messageField.setValue("");
 /*				chatPanel.scroll*/
