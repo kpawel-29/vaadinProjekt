@@ -9,13 +9,16 @@ public class MessageData {
 	public String text;
 	public String author;
 	public Date time;
+	public String color;
+	
 	private MessageManager ms = new MessageManager();
 	
-	public MessageData(String text, String author, Date time) {
+	public MessageData(String text, String author, Date time, String color) {
 		super();
 		this.text = text;
 		this.author = author;
 		this.time = time;
+		this.color = color;
 	}
 	public String getText() {
 		return ms.convertMessage(text);
@@ -34,6 +37,12 @@ public class MessageData {
 	}
 	public void setTime(Date time) {
 		this.time = time;
+	}
+	public String getColor() {
+		return color;
+	}
+	public void setColor(String color) {
+		this.color = color;
 	}
 
 	

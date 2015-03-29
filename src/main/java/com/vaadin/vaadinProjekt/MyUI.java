@@ -16,6 +16,7 @@ import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.annotations.Widgetset;
+import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.shared.ui.colorpicker.Color;
@@ -131,6 +132,8 @@ public class MyUI extends UI implements MessageListener {
 		layout.addComponent(header);
 		layout.addComponent(chatPanel);
 		layout.addComponent(footer);
+		
+		btnSend.setClickShortcut(ShortcutAction.KeyCode.ENTER);
 
 		btnSend.addClickListener(new Button.ClickListener() {
 
