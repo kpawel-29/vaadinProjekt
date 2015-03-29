@@ -1,7 +1,5 @@
 package com.vaadin.vaadinProjekt;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.servlet.annotation.WebServlet;
@@ -10,7 +8,6 @@ import com.example.vaadinProjekt.domain.User;
 import com.example.vaadinProjekt.service.MessageBroadcaster;
 import com.example.vaadinProjekt.service.MessageData;
 import com.example.vaadinProjekt.service.MessageListener;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
@@ -22,9 +19,7 @@ import com.vaadin.ui.AbsoluteLayout;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.FormLayout;
-import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
@@ -32,6 +27,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 
 /**
  *
@@ -41,8 +37,12 @@ import com.vaadin.ui.VerticalLayout;
 @Push
 public class MyUI extends UI implements MessageListener{
 
+	private static final long serialVersionUID = 1L;
 	final VerticalLayout chatContent = new VerticalLayout();
 	final TextField messageField = new TextField();
+	final Panel chatPanel = new Panel("Chat");
+	final Window window = new Window("Podaj nick");
+	final FormLayout loginForm = new FormLayout();
 	
 	
 	@Override
@@ -52,11 +52,22 @@ public class MyUI extends UI implements MessageListener{
 		setContent(layout);
 
 		final User user = new User(0, "nieznajomy");
-
-		final Panel chatPanel = new Panel("Chat");
 		chatPanel.setHeight("400px");
 
+		window.setWidth(150.0f, Unit.PIXELS);
+		window.center();
+		window.setClosable(true);
+		window.setDraggable(false);
+		window.setResizable(false);
 		
+		final TextField loginField = new TextField("", "");
+		loginField.setWidth(90.0f, Unit.PERCENTAGE);
+		final Button btnOK = new Button("OK");
+		loginForm.addComponent(loginField);
+		loginForm.addComponent(btnOK);
+		
+	    window.setContent(loginForm);
+	    
 		chatContent.setMargin(true);
 
 		chatPanel.setContent(chatContent);
@@ -65,37 +76,53 @@ public class MyUI extends UI implements MessageListener{
 		header.setWidth(100.0f, Unit.PERCENTAGE);
 		header.setHeight("50px");
 		Button btnLogin = new Button("Zaloguj");
-		Label lblWelcome = new Label("Witaj nieznajomy!");
+		btnLogin.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				addWindow(window);
+				
+			}
+		});
+		
+		Label lblWelcome = new Label("Witaj <b>"+user.getName()+"!</b>",ContentMode.HTML);
 
 		header.addComponent(lblWelcome, "left: 10px; top: 5px;");
 		header.addComponent(btnLogin, "right: 10px; top: 2px;");
 
-		final AbsoluteLayout footer = new AbsoluteLayout();
-		footer.setHeight("50px");
-
+		final HorizontalLayout footer = new HorizontalLayout();
+		//footer.setHeight("50px");
+		footer.addComponent(messageField);
 		Button btnSend = new Button("Wyślij");
-		messageField.setWidth(90.0f, Unit.PERCENTAGE);
+		//btnSend.setWidth(10.0f, Unit.PERCENTAGE);
+		footer.addComponent(btnSend);
+		
+		footer.setWidth(100.0f, Unit.PERCENTAGE);
+		footer.setExpandRatio(messageField, 1.0f);
+
+		
+		messageField.setWidth(100.0f, Unit.PERCENTAGE);
 		// btnSend.setWidth(10.0f, Unit.PERCENTAGE);
 
-		footer.addComponent(messageField);
-		footer.addComponent(btnSend, "right: 0px; top: 0px;");
+		btnOK.addClickListener(new Button.ClickListener() {
+			
+			@Override
+			public void buttonClick(ClickEvent event) {
+				window.close();
+				user.setName(loginField.getValue().toString());
+				
+			}
+		});
 
 		layout.addComponent(header);
 		layout.addComponent(chatPanel);
 		layout.addComponent(footer);
 		
-		//actual time parser
-	/*	Date now = new Date();
-		String nowString = now.toString();
-		Date date = null;
-		try {
-			date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(nowString);
-		} catch (ParseException e) {
-		}
-		String dateNow = null;
-		dateNow = new SimpleDateFormat("H:mm").format(date);*/
-
+		
 		btnSend.addClickListener(new Button.ClickListener() {
+
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void buttonClick(ClickEvent event) {
 				if (messageField.isEmpty()) {
@@ -103,11 +130,8 @@ public class MyUI extends UI implements MessageListener{
 							"Nie możesz wysłać pustej wiadomości",
 							Type.TRAY_NOTIFICATION);
 				} else {
-					MessageBroadcaster.broadcast(new MessageData(messageField.getValue(), user.getName()));
-					/*chatContent.addComponent(new Label("(time) <b>" + user.getName()
-							+ "</b> " + messageField.getValue(),
-							ContentMode.HTML));
-					messageField.setValue("");*/
+					MessageBroadcaster.broadcast(new MessageData(messageField.getValue(), user.getName(), new Date()));
+
 				}
 			}
 		});
@@ -116,11 +140,21 @@ public class MyUI extends UI implements MessageListener{
 		
 
 	}
+	/*
+	 * https://vaadin.com/forum/#!/thread/97069/1359208
+	 */
+/*	private void scrollIntoView() {
+        final VerticalLayout layout = (VerticalLayout)chatContent.getContent();
+        if (getApplication() != null && layout.getComponentCount() > 0)
+            getApplication().getMainWindow().scrollIntoView(layout.getComponent(layout.getComponentCount() - 1));
+    }*/
 
 
 	@WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)
 	@VaadinServletConfiguration(ui = MyUI.class, productionMode = false)
 	public static class MyUIServlet extends VaadinServlet {
+
+		private static final long serialVersionUID = 1L;
 	}
 
 	@Override
@@ -129,10 +163,11 @@ public class MyUI extends UI implements MessageListener{
 			
 			@Override
 			public void run() {
-				chatContent.addComponent(new Label("(time) <b>" + messageData.getAuthor()
-						+ "</b> " + messageData.text,
+				chatContent.addComponent(new Label("("+messageData.getTime()+") <b>" + messageData.getAuthor()
+						+ "</b>: " + messageData.text,
 						ContentMode.HTML));
 				messageField.setValue("");
+/*				chatPanel.scroll*/
 			}
 		});
 		
